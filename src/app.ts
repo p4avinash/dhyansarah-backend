@@ -1,15 +1,18 @@
 import "dotenv/config"
 import express from "express"
+import routes from './routes/index'
+import connectDB from "./db/connect"
 
+const port = process.env.PORT_NO
 const app = express()
 
-const connectDB = require("./db/connect")
-
-const port = 5000
+app.use(express.json());
 
 app.get("/", (req, res) => {
   res.send("Hello, from backend")
 })
+
+app.use('/', routes);
 
 const start = async () => {
   try {
