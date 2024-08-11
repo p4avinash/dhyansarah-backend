@@ -1,18 +1,50 @@
-import {Request, Response} from 'express';
+import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
-import User from '../models/users';
+import User from "../models/users";
+import jwt, { Secret } from "jsonwebtoken";
+import { configVariables } from "../config";
+import {
+  ReasonPhrases,
+  StatusCodes,
+  getReasonPhrase,
+  getStatusCode,
+} from "http-status-codes";
 
 export const register = async (req: Request, res: Response) => {
-    const { email, password, firstName, lastName } = req.body;
-    try {
-        const oldUser = await User.findOne({ email });
-        if (oldUser) return res.status(400).json({ message: "User already exists" });
-        const hashedPassword = await bcrypt.hash(password, 12);
-        await User.create({ firstName, lastName, email, password: hashedPassword });
-        res.status(201).json({ message: "Registration successful" });
-    } catch (error) {
-        res.status(500).json({ message: "Something went wrong" });
-        console.error(error);
-    }
+  const { email, password, firstName, lastName } = req.body;
+  try {
+    const oldUser = await User.findOne({ email });
+    if (oldUser)
+      return res.status(400).json({ message: "User already exists" });
+    const hashedPassword = await bcrypt.hash(password, 12);
+    await User.create({ firstName, lastName, email, password: hashedPassword });
+    res.status(StatusCodes.CREATED).json({ message: ReasonPhrases.CREATED });
+  } catch (error) {
+    res.status(500).json({ message: "Something went wrong" });
+    console.error(error);
+  }
 };
 
+export const login = async (req: Request, res: Response) => {
+  const { email, password } = req.body;
+  try {
+    const user = await User.findOne({ email });
+    if (user) {
+      const isPasswordCorrect = await bcrypt.compare(password, user.password);
+      if (isPasswordCorrect) {
+        const token = jwt.sign(
+          { email: user.email, id: user._id },
+          configVariables.SECRET_KEY as Secret,
+          { expiresIn: "10h" }
+        );
+        return res.status(StatusCodes.OK).json({ token });
+      }
+    }
+    return res.status(StatusCodes.OK).json({ message: "Invalid Credentials" });
+  } catch (error) {
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: ReasonPhrases.INTERNAL_SERVER_ERROR });
+    console.error(error);
+  }
+};
