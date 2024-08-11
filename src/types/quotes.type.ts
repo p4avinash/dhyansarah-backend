@@ -14,4 +14,5 @@ export interface IQuote extends Document {
   textYCoordinate: number
   createdAt: Date
   lastActive: Date
+  createdBy: Types.ObjectId
 }
