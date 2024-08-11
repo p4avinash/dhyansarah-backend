@@ -4,7 +4,7 @@ import { body, validationResult } from "express-validator";
 
 /**
  * Validation rules for user registration
-*/
+ */
 export const validateUserRegistration = [
   body("lastName")
     .isString()
@@ -25,7 +25,7 @@ export const validateUserRegistration = [
 ];
 
 /* Validation rules for user login */
-const validateUserLogin = [
+export const validateUserLogin = [
   body("email").isEmail().withMessage("Must be a valid email address"),
   body("password").not().isEmpty().withMessage("Password cannot be empty"),
 ];
