@@ -48,3 +48,38 @@ export const login = async (req: Request, res: Response) => {
     console.error(error);
   }
 };
+
+export const getProfile = async (req: Request, res: Response) => {
+  try {
+    const userId = req.params.userId;
+    const user = await User.findById(userId).select("-password");
+    res.status(StatusCodes.OK).json({ userDetails: user });
+  } catch (error) {
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: ReasonPhrases.INTERNAL_SERVER_ERROR });
+    console.error(error);
+  }
+};
+
+export const updateProfile = async (req: Request, res: Response) => {
+  try {
+    const userId = req.params.userId;
+    const updateData = req.body;
+    const updatedUser = await User.findByIdAndUpdate(userId, updateData, {
+      new: true,
+      select: "-password",
+    });
+    if (!updatedUser) {
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .json({ message: "User not found" });
+    }
+    res.status(StatusCodes.OK).json(updatedUser);
+  } catch (error) {
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: ReasonPhrases.INTERNAL_SERVER_ERROR });
+    console.error(error);
+  }
+};

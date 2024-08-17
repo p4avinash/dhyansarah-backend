@@ -30,6 +30,12 @@ export const validateUserLogin = [
   body("password").not().isEmpty().withMessage("Password cannot be empty"),
 ];
 
+/* Validation rules for user login */
+export const validateUpdateUser = [
+  body("email").isEmail().withMessage("Must be a valid email address"),
+  body("password").not().isEmpty().withMessage("Password cannot be empty"),
+];
+
 /* Middleware to handle validation result */
 export const handleValidationErrors = (
   req: Request,
