@@ -63,6 +63,9 @@ const quoteSchema = new Schema<IQuote>({
     type: Date,
     default: Date.now,
   },
+  createdBy: {
+    type: Schema.Types.ObjectId,
+  },
 })
 
 const Quote = model<IQuote>("Quote", quoteSchema)
